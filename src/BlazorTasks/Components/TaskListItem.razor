@@ -1,0 +1,50 @@
+﻿@using BlazorTasks.Models
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+<li @key="Item" class="list-group-item d-flex justify-content-between align-items-center">
+    <span class="d-flex justify-content-start align-items-center">
+        <input class="form-check-input me-1 rounded-circle" type="checkbox" checked="@Item.IsCompleted" @onchange="@((ChangeEventArgs __e) => HandleUpdateTaskCompleted(__e, Item))" id="firstCheckboxStretched">
+        <input @ref="Item.Reference" name="edit" class="form-control-plaintext ms-2" value="@Item.Name" @onchange="@((ChangeEventArgs __e) => HandleUpdateTaskName(__e, Item))"/>
+    </span>
+    <a class="icon-link link-info" href="#" data-bs-toggle="dropdown">
+        <i class="bi bi-info-circle"></i>
+    </a>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item text-danger" href="#" @onclick="@(() => HandleDeleteTask(Item))">Delete</a></li>
+    </ul>
+</li>
+@code {
+    [Parameter]
+    public TaskItem Item { get; set; } = new TaskItem();
+
+    [Parameter]
+    public EventCallback OnUpdateTaskName { get; set; }
+
+    [Parameter]
+    public EventCallback OnUpdateTaskCompleted { get; set; }
+
+    [Parameter]
+    public EventCallback OnDeleteTask {get; set;}
+
+    private string GetCssClass(TaskItem item)
+    {
+        return $"{item.ElementClass} list-group-item d-flex justify-content-between align-items-center";
+    }
+
+    private async Task HandleDeleteTask(TaskItem item)
+    {
+        await OnDeleteTask.InvokeAsync(item);
+    }
+
+    private async Task HandleUpdateTaskName(ChangeEventArgs e, TaskItem item)
+    {
+        item.Name = e.Value?.ToString();
+        await OnUpdateTaskName.InvokeAsync(item);
+    }
+
+    private async Task HandleUpdateTaskCompleted(ChangeEventArgs e, TaskItem item)
+    {
+        var inputCompleted = Convert.ToBoolean(e.Value);
+        item.IsCompleted = inputCompleted;
+        await OnUpdateTaskCompleted.InvokeAsync(item);
+    }
+}

@@ -1,0 +1,56 @@
+﻿@using BlazorTasks.Models
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@if ((!TaskItems.Any(x => x.IsCompleted == false) && !ShowCompleted) || !TaskItems.Any())
+{
+    <div class="overlay">
+        <h5 class="text-secondary">All Tasks Completed</h5>
+    </div>
+}
+else
+{
+    <div class="mb-5">
+        <ul class="list-group list-group-flush">
+            @foreach (var item in TaskItems.Where(x => x.IsCompleted == false))
+            {
+                <TaskListItem Item="item" OnUpdateTaskName="@(()=>UpdateTaskName(item))" OnUpdateTaskCompleted="@(()=>UpdateTaskCompleted(item))" OnDeleteTask="@(()=>DeleteTask(item))" />
+            }
+        </ul>
+        @if (ShowCompleted)
+        {
+            <ul class="list-group list-group-flush">
+                @if (TaskItems.Any(x => x.IsCompleted == true) && TaskItems.Any(x => x.IsCompleted == false))
+                {
+                    <li class="list-separator"></li>
+                }
+                @foreach (var item in TaskItems.Where(x => x.IsCompleted == true))
+                {
+                    <TaskListItem Item="item" OnUpdateTaskName="@(()=>UpdateTaskName(item))" OnUpdateTaskCompleted="@(()=>UpdateTaskCompleted(item))" OnDeleteTask="@(()=>DeleteTask(item))" />
+                }
+            </ul>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<TaskItem> TaskItems { get; set; } = new List<TaskItem>();
+
+    [Parameter]
+    public bool ShowCompleted { get; set; }
+
+    private async Task UpdateTaskName(TaskItem item)
+    {
+        await localStorage.SetItemAsync<List<TaskItem>>("tasks", TaskItems);
+    }
+
+    private async Task UpdateTaskCompleted(TaskItem item)
+    {
+        await localStorage.SetItemAsync<List<TaskItem>>("tasks", TaskItems);
+    }
+
+    private async Task DeleteTask(TaskItem item)
+    {
+        TaskItems.Remove(item);
+        await localStorage.SetItemAsync<List<TaskItem>>("tasks", TaskItems);
+    }
+}

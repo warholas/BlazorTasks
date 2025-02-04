@@ -1,0 +1,51 @@
+﻿<div class="d-flex justify-content-between">
+    <h1 class="text-info fw-bold">@Title</h1>
+    <div>
+        <a class="icon-link text-info fw-bold" href="#" data-bs-toggle="dropdown" aria-expanded="false" name="tasks-options" id="tasks-options" role="button"><i class="bi bi-three-dots"></i></a>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#" @onclick="HandleToggleShowCompleted">@(ShowCompleted ? "Hide Completed" : "Show Completed")</a></li>
+            <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#exampleModal">Delete All</a></li>
+        </ul>
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Delete all tasks?</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete all tasks? This action cannot be undone.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal" @onclick="DeleteAll">Delete all</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public bool ShowCompleted { get; set; } = true;
+
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnToggleShowCompleted { get; set; }
+
+    [Parameter]
+    public EventCallback OnDeleteAll { get; set; }
+
+    private async Task HandleToggleShowCompleted()
+    {
+        ShowCompleted = !ShowCompleted;
+        await OnToggleShowCompleted.InvokeAsync();
+    }
+
+    private async Task DeleteAll()
+    {
+        await OnDeleteAll.InvokeAsync();
+    }
+}
