@@ -1,0 +1,14 @@
+﻿<nav class="navbar fixed-bottom bg-body-tertiary">
+    <div class="container-fluid">
+        <button class="btn text-info fw-bold" name="add-task" id="add-task" role="button" @onclick="AddTask"><i class="bi bi-plus-circle-fill pe-2"></i> New Task</button>
+    </div>
+</nav>
+@code {
+    [Parameter]
+    public EventCallback OnAddTask { get; set; }
+
+    private async Task AddTask()
+    {
+        await OnAddTask.InvokeAsync();
+    }
+}

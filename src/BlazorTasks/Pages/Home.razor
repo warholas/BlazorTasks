@@ -1,7 +1,45 @@
 ﻿@page "/"
+@using BlazorTasks.Models
+@using BlazorTasks.Components
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Tasks</PageTitle>
 
-<h1>Hello, world!</h1>
+<Header Title="Tasks" ShowCompleted="showCompleted" OnToggleShowCompleted="ToggleShowCompleted" OnDeleteAll="DeleteAll" />
 
-Welcome to your new app.
+<TaskList TaskItems="taskItems" ShowCompleted="showCompleted" />
+
+<Footer OnAddTask="AddTask" />
+
+@code {
+    private bool showCompleted = false;
+    private List<TaskItem> taskItems = new List<TaskItem>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        showCompleted = await localStorage.GetItemAsync<bool>("showCompleted");
+        taskItems = await localStorage.GetItemAsync<List<TaskItem>>("tasks") ?? new List<TaskItem>();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task AddTask()
+    {
+        TaskItem selectedItem = new() { Name = $"Task {taskItems.Count + 1}" };
+        taskItems.Add(selectedItem);
+        await localStorage.SetItemAsync<List<TaskItem>>("tasks", taskItems);
+        await Task.Delay(500);
+        await selectedItem.Reference.FocusAsync();
+    }
+
+    private async Task ToggleShowCompleted()
+    {
+        showCompleted = !showCompleted;
+        await localStorage.SetItemAsync<bool>("showCompleted", showCompleted);
+    }
+
+    private async Task DeleteAll()
+    {
+        taskItems.Clear();
+        await localStorage.SetItemAsync<List<TaskItem>>("tasks", taskItems);
+    }
+}
