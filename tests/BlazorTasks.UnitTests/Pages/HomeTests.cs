@@ -1,6 +1,6 @@
 ﻿using Bunit;
 using Xunit;
-using BlazorTasks.Components.Pages;
+using BlazorTasks.Pages;
 namespace BlazorTasks.UnitTests.Pages;
 public class HomeTests : TestContext
 {
